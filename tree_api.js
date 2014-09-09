@@ -8,26 +8,27 @@
         this.structure = [];
         this.content = content;
         this.content.sort(function(a,b) {
-	        var a = a.relations.parent,
-	            b = b.relations.parent;
+            if (a.relations == null) {
+                return -1;
+            } else if (b.relations == null) {
+                return +1;
+            } else {
+                var a = a.relations.parent,
+                    b = b.relations.parent;
 
-	        if(a instanceof Array){
-	            a.sort();
-	            a = a[0];
-	        }
+                if (a instanceof Array) {
+                    a.sort();
+                    a = a[0];
+                }
 
-	        if(b instanceof Array) {
-	            b.sort();
-	            b = b[0];
-	        }
+                if (b instanceof Array) {
+                    b.sort();
+                    b = b[0];
+                }
 
-	        if(a == null) {
-	            return -1;
-	        } else if (b == null) {
-	            return +1;
-	        } else {
-	            return a - b;
-	        }
+
+                return a - b;
+            }
 	    });
 
 	    for(var elem in this.content) {
@@ -51,8 +52,6 @@
         }
         return this;
     }
-
-
 
     Tree.prototype.find = function (id) {
         if (!(id instanceof 'number')) {
@@ -109,7 +108,7 @@
     	this.neighbors = neighbors;
     }
 
-    if(!q){
+    if(!g){
     	return {
     		TreeElement: TreeElement,
     		Tree: Tree

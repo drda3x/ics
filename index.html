@@ -6,6 +6,44 @@
     <script type="text/javascript" src="tree_api.js"></script>
 </head>
 <body>
+    <script>
+        /**
+         * test - fixture
+         */
 
+        var test = [
+            {
+                id: 0,
+                name: 'base-level',
+                relations: null
+            },
+            {
+                id: 1,
+                name: 'first-level-1',
+                relations: {
+                    parent: 0
+                }
+            },
+            {
+                id: 2,
+                name: 'first-level-2',
+                relations: {
+                    parent: 0
+                }
+            },
+            {
+                id: 3,
+                name: 'second-level-1',
+                relations: {
+                    parent: 1
+                }
+            }
+        ]
+
+
+        var testTree = new ics.Tree(test);
+
+        console.log(testTree);
+    </script>
 </body>
 </html>
