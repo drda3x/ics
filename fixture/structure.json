@@ -1,0 +1,120 @@
+{
+    "groups": [
+        {
+            "id": 2,
+            "parent": 1,
+            "name": "WebServer"
+        },
+        {
+            "id": 1,
+            "parent": 0,
+            "name": "DataBase"
+        },
+        {
+            "id": 3,
+            "parent": 2,
+            "name": "Application"
+        },
+        {
+            "id": 0,
+            "parent": null,
+            "name": "System"
+        }
+    ],
+    "nodes": [
+        {
+            "id": 0,
+            "name": "Test-system",
+            "group": 0,
+            "relationships": []
+        },
+        {
+            "id": 1,
+            "name": "App 1",
+            "group": 1,
+            "relationships": [
+                {
+                    "target": 0,
+                    "name": "RS-name 1"
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "name": "App 2",
+            "group": 1,
+            "relationships": [
+                {
+                    "target": 0,
+                    "name": "RS-name 1"
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "name": "App 3",
+            "group": 1,
+            "relationships": [
+                {
+                    "target": 0,
+                    "name": "RS-name 1"
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "name": "App 4",
+            "group": 1,
+            "relationships": [
+                {
+                    "target": 0,
+                    "name": "RS-name 1"
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "name": "App 5",
+            "group": 1,
+            "relationships": [
+                {
+                    "target": 0,
+                    "name": "RS-name 1"
+                }
+            ]
+        },
+        {
+            "id": 6,
+            "name": "App 6",
+            "group": 1,
+            "relationships": [
+                {
+                    "target": 0,
+                    "name": "RS-name 1"
+                }
+            ]
+        },
+        {
+            "id": 7,
+            "name": "App 7",
+            "group": 1,
+            "relationships": [
+                {
+                    "target": 2,
+                    "name": "RS-name 1"
+                }
+            ]
+        },
+        {
+            "id": 8,
+            "name": "App 8",
+            "group": 1,
+            "relationships": [
+                {
+                    "target": 2,
+                    "name": "RS-name 1"
+                }
+            ]
+        }
+    ]
+}
