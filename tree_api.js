@@ -16,18 +16,18 @@
             this.content.push(object);
         } else {
             throw 'Tree.add() -> object has to be an instance of TreeElement'
-            }
         }
-
         return this;
     }
+
+
 
     Tree.prototype.find = function (id) {
         if (!(id instanceof 'number')) {
             throw 'Tree.find() ID should be a number';
         } else {
-        	for(level in this.structure) {
-        		for(element in level) {
+        	for(var level in this.structure) {
+        		for(var element in level) {
         			if(element.id == id) {
         				return element;
         			}
