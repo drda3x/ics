@@ -75,13 +75,31 @@
      *  Method to get layer for chosen element
      */
     Tree.prototype.getLayer = function(element) {
-    	for(var layer in structure) {
-    		for(var _element in layer) {
-    			if(_element.id = element.parent) {
-    				return layer;
-    			}
-    		}
-    	}
+
+        if(element.parents == null) {
+            return this.structure[0];
+        }
+
+        var thisLayer = false;
+
+    	for(var layer in this.structure) {
+            for (var _element in layer) {
+                if (_element.id = element.parent) {
+                    thisLayer = true;
+                }
+            }
+            if (thisLayer) {
+                return layer;
+            }
+        }
+
+        if (thisLayer) {
+            layer = [];
+            this.structure.push(layer);
+            return layer;
+        }
+        return null;
+
     }
 
     function TreeElement(id, name, parents, neighbors) {
