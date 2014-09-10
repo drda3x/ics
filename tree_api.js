@@ -1,4 +1,4 @@
-(function (g) {
+(function (g, d3) {
     'use strict';
 
     /**
@@ -37,9 +37,11 @@
 			 * 2. Вставить элемент на позицию
 	    	 */
 	    	 var elem = this.content[index]
+            elem.position = {};
 	    	 var layer = this.getLayer(elem);
-	    	 layer.push(elem);
+	    	 layer.data.push(elem);
 	    }
+
     }
 
     /**
@@ -69,19 +71,68 @@
         }
     }
 
-    Tree.prototype.draw = function() {}
+    Tree.prototype.draw = function(selector) {
+        /**
+         * 1. Обходим структуру по слоям
+         * 2. Горизонталь: Для каждого слоя смотрим количество элементов на слое и расчитываем расстояние между ними т.о.
+         *      чтобы расстояние между ники было одинаковым.
+         *    Вертикаль: Каждый новый слой отображается += некая константа.
+         */
+
+        var self = this,
+            container = d3.select(selector),
+            width = parseInt(container.style('width')),
+            height = parseInt(container.style('height')),
+            svg = d3.select(selector)
+                .append('svg')
+                .style('width', width)
+                .style('height', height);
+
+        svg.selectAll('circle')
+            .data(this.content)
+            .enter()
+            .append('circle')
+            .attr('cx', function(d) {
+                var layer = self.getLayer(d),
+                    step = width / (1 + layer.data.length),
+                    position = (function(l, e) {
+                    for(var i= 0, j= l.length; i<j; i++) {
+                        if(l[i].id == e.id) {
+                            return i + 1;
+                        }
+                    }
+                })(layer.data, d);
+
+                d.position.x = step * position;
+                return d.position.x
+            })
+            .attr('cy', function(d) {
+                var layer = self.getLayer(d);
+
+                d.position.y = 25 * (layer.level + 1);
+
+                return d.position.y;
+            })
+            .attr('r', 8);
+    }
 
     /**
      *  Method to get layer for chosen element
      */
     Tree.prototype.getLayer = function(element) {
 
+        var layer,
+            layerIndex = 0;
+
         if(element.relations == null) {
-        	var layer = this.structure[0];
+        	layer = this.structure[0];
         	if(layer) {
         		return layer;      	
         	} else {
-        		layer = [];
+        		layer = {
+                    level: layerIndex,
+                    data: []
+                };
         		this.structure.push(layer);
         		return layer;
         	}
@@ -91,23 +142,26 @@
         var thisLayer = false;
 
     	for(var layers in this.structure) {
-    		var layer = this.structure[layers];
+    		layer = this.structure[layers];
 
     		if (thisLayer) {
                 return layer;
             }
 
-            for (var _elements in layer) {
-            	var _element = layer[_elements];
+            for (var _elements in layer.data) {
+            	var _element = layer.data[_elements];
                 if (_element.id == element.relations.parent) {
                     thisLayer = true;
                 }
             }
-            
+            layerIndex++;
         }
 
         if (thisLayer) {
-            layer = [];
+            layer = {
+                level: layerIndex,
+                data: []
+            };
             this.structure.push(layer);
             return layer;
         }
@@ -135,7 +189,7 @@
     g.ics.TreeElement = TreeElement;
     g.ics.Tree = Tree;
 
-})(this);
+})(this, d3);
 
 
 /*
