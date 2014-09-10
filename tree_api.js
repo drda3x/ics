@@ -57,11 +57,13 @@
     }
 
     Tree.prototype.find = function (id) {
-        if (!(id instanceof 'number')) {
+        if (!(typeof id == 'number')) {
             throw 'Tree.find() ID should be a number';
         } else {
-        	for(var level in this.structure) {
-        		for(var element in level) {
+        	for(var lev_index= 0, lev_last= this.structure.length; lev_index < lev_last; lev_index++) {
+                var level = this.structure[lev_index];
+        		for(var elem_index= 0, elem_last= level.data.length; elem_index < elem_last; elem_index++) {
+                    var element = level.data[elem_index];
         			if(element.id == id) {
         				return element;
         			}
@@ -103,17 +105,50 @@
                     }
                 })(layer.data, d);
 
-                d.position.x = step * position;
-                return d.position.x
+                if(d.relations != null) {
+                    var children = [],
+                        parent = self.find(d.relations.parent);
+                    for(var i= 0, j= layer.data.length; i<j; i++) {
+                        if(layer.data[i].relations.parent == parent.id) {
+                            children.push(layer.data[i]);
+                        }
+                    }
+
+                    var offset = ((parent.position.toNextElement && children.length > 1) ? parent.position.toNextElement/2 : 50 * (children.length - 1));
+
+                    position = (function(l, e) {
+                        for(var i= 0, j= l.length; i<j; i++) {
+                            if(l[i].id == e.id) {
+                                return i;
+                            }
+                        }
+                    })(children, d);
+
+                    var x1 = parent.position.x - offset,
+                        x2 = parent.position.x + offset,
+                        d1 = x2 - x1,
+                        off = Math.round(d1/((layer.data.length-1 > 1) ? layer.data.length-1 : 1));
+
+                    d.position.toNextElement = off;
+
+                    d.position.x = parent.position.x - offset + off * position;
+                    return d.position.x;
+                } else {
+                    d.position.x = step * position
+                    return d.position.x;
+                }
             })
             .attr('cy', function(d) {
                 var layer = self.getLayer(d);
 
-                d.position.y = 25 * (layer.level + 1);
+                d.position.y = 50 * (layer.level + 1);
 
                 return d.position.y;
             })
-            .attr('r', 8);
+            .attr('r', 8)
+            .attr('id', function(d) {
+                return d.id
+            });
     }
 
     /**
