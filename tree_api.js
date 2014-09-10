@@ -127,7 +127,7 @@
                     var x1 = parent.position.x - offset,
                         x2 = parent.position.x + offset,
                         d1 = x2 - x1,
-                        off = Math.round(d1/((layer.data.length-1 > 1) ? layer.data.length-1 : 1));
+                        off = Math.round(d1/((children.length-1 > 1) ? children.length-1 : 1));
 
                     d.position.toNextElement = off;
 
