@@ -1,6 +1,12 @@
 (function (g, d3) {
     'use strict';
 
+    var colors = [
+        '#0106FF',
+        '#01A976',
+        '#FF0181'
+    ];
+
     /**
      * Class for create and manipulate the tree structure
      */
@@ -13,21 +19,24 @@
             } else if (b.relations == null) {
                 return +1;
             } else {
-                var a = a.relations.parent,
-                    b = b.relations.parent;
+                var v1 = a.relations.parent,
+                    v2 = b.relations.parent;
 
-                if (a instanceof Array) {
-                    a.sort();
-                    a = a[0];
+                if (v1 instanceof Array) {
+                    v1.sort();
+                    v1 = v1[0];
                 }
 
-                if (b instanceof Array) {
-                    b.sort();
-                    b = b[0];
+                if (v2 instanceof Array) {
+                    v2.sort();
+                    v2 = v2[0];
                 }
 
-
-                return a - b;
+                if(v1 == v2) {
+                    return a.id - b.id;
+                } else {
+                    return v1 - v2;
+                }
             }
 	    });
 
@@ -36,7 +45,7 @@
 			 * 1. Узнать слой на который надо вставить элемент
 			 * 2. Вставить элемент на позицию
 	    	 */
-	    	 var elem = this.content[index]
+	    	 var elem = this.content[index];
             elem.position = {};
 	    	 var layer = this.getLayer(elem);
 	    	 layer.data.push(elem);
@@ -54,7 +63,7 @@
             throw 'Tree.add() -> object has to be an instance of TreeElement'
         }
         return this;
-    }
+    };
 
     Tree.prototype.find = function (id) {
         if (!(typeof id == 'number')) {
@@ -71,7 +80,7 @@
         	}
         	return null;
         }
-    }
+    };
 
     Tree.prototype.draw = function(selector) {
         /**
@@ -80,6 +89,8 @@
          *      чтобы расстояние между ники было одинаковым.
          *    Вертикаль: Каждый новый слой отображается += некая константа.
          */
+
+
 
         var self = this,
             container = d3.select(selector),
@@ -90,14 +101,85 @@
                 .style('width', width)
                 .style('height', height);
 
+        this.calculatePositions(container);
+
+        var links = [],
+            target;
+        for(var element_index= 0, last_index= this.content.length; element_index < last_index; element_index++) {
+            var element = this.content[element_index];
+            for(var key in element.relations) {
+                var relation = element.relations[key];
+                if(!(relation instanceof Array)) {
+                    relation = [relation];
+                }
+                for(var rel_index= 0, last_rel= relation.length; rel_index < last_rel; rel_index++) {
+                    target = this.find(relation[rel_index]);
+
+                    links.push({
+                        from: {
+                            x: element.position.x,
+                            y: element.position.y
+                        },
+                        to: {
+                            x: target.position.x,
+                            y: target.position.y
+                        }
+                    });
+                }
+            }
+        }
+
+        svg.selectAll('line')
+            .data(links)
+            .enter()
+            .append('line')
+            .attr('x1', function(d) {
+                return d.from.x;
+            })
+            .attr('y1', function(d) {
+                return d.from.y;
+            })
+            .attr('x2', function(d) {
+                return d.to.x;
+            })
+            .attr('y2', function(d) {
+                return d.to.y;
+            })
+            .attr('stroke','#0106FF')
+            .attr('stroke-width', 2);
+
         svg.selectAll('circle')
             .data(this.content)
             .enter()
             .append('circle')
             .attr('cx', function(d) {
-                var layer = self.getLayer(d),
-                    step = width / (1 + layer.data.length),
-                    position = (function(l, e) {
+                return d.position.x;
+            })
+            .attr('cy', function(d) {
+                return d.position.y;
+            })
+            .attr('r', 15)
+            .attr('id', function(d) {
+                return d.id
+            })
+            .attr('fill', function(d) {
+                return colors[d.group];
+            });
+
+    };
+
+    Tree.prototype.calculatePositions = function(container) {
+
+        var width = parseInt(container.style('width')),
+            height = parseInt(container.style('height'));
+
+        for(var elem_index= 0, last_elem= this.content.length; elem_index<last_elem; elem_index++) {
+
+            var d = this.content[elem_index];
+
+            var layer = this.getLayer(d),
+                step = width / (1 + layer.data.length),
+                position = (function(l, e) {
                     for(var i= 0, j= l.length; i<j; i++) {
                         if(l[i].id == e.id) {
                             return i + 1;
@@ -105,51 +187,42 @@
                     }
                 })(layer.data, d);
 
-                if(d.relations != null) {
-                    var children = [],
-                        parent = self.find(d.relations.parent);
-                    for(var i= 0, j= layer.data.length; i<j; i++) {
-                        if(layer.data[i].relations.parent == parent.id) {
-                            children.push(layer.data[i]);
+            if(d.relations != null) {
+                var children = [],
+                    parent = this.find(d.relations.parent);
+                for(var i= 0, j= layer.data.length; i<j; i++) {
+                    if(layer.data[i].relations.parent == parent.id) {
+                        children.push(layer.data[i]);
+                    }
+                }
+
+                var offset = ((parent.position.toNextElement && children.length > 1) ? parent.position.toNextElement/2 : 75 * (children.length - 1));
+
+                position = (function(l, e) {
+                    for(var i= 0, j= l.length; i<j; i++) {
+                        if(l[i].id == e.id) {
+                            return i;
                         }
                     }
+                })(children, d);
 
-                    var offset = ((parent.position.toNextElement && children.length > 1) ? parent.position.toNextElement/2 : 50 * (children.length - 1));
+                var x1 = parent.position.x - offset,
+                    x2 = parent.position.x + offset,
+                    d1 = x2 - x1,
+                    off = Math.round(d1/((children.length-1 > 1) ? children.length-1 : 1));
 
-                    position = (function(l, e) {
-                        for(var i= 0, j= l.length; i<j; i++) {
-                            if(l[i].id == e.id) {
-                                return i;
-                            }
-                        }
-                    })(children, d);
+                d.position.toNextElement = off;
+                d.position.x = parent.position.x - offset + off * position;
+            } else {
+                d.position.x = step * position;
+            }
 
-                    var x1 = parent.position.x - offset,
-                        x2 = parent.position.x + offset,
-                        d1 = x2 - x1,
-                        off = Math.round(d1/((children.length-1 > 1) ? children.length-1 : 1));
+            d.position.y = 100 * (layer.level + 1);
 
-                    d.position.toNextElement = off;
+        }
 
-                    d.position.x = parent.position.x - offset + off * position;
-                    return d.position.x;
-                } else {
-                    d.position.x = step * position
-                    return d.position.x;
-                }
-            })
-            .attr('cy', function(d) {
-                var layer = self.getLayer(d);
-
-                d.position.y = 50 * (layer.level + 1);
-
-                return d.position.y;
-            })
-            .attr('r', 8)
-            .attr('id', function(d) {
-                return d.id
-            });
-    }
+        return this;
+    };
 
     /**
      *  Method to get layer for chosen element
@@ -201,7 +274,7 @@
             return layer;
         }
         return undefined;
-    }
+    };
 
     function TreeElement(id, name, parents, neighbors) {
     	this.id = id;

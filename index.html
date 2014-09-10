@@ -15,51 +15,99 @@
                 {
                     id: 0,
                     name: 'base-level',
-                    relations: null
+                    relations: null,
+                    group: 0
                 },
                 {
                     id: 1,
                     name: 'first-level-1',
                     relations: {
                         parent: 0
-                    }
+                    },
+                    group: 1
                 },
                 {
                     id: 2,
                     name: 'first-level-2',
                     relations: {
-                        parent: 0
-                    }
+                        parent: 0,
+                        neighbors: 1
+                    },
+                    group: 1
                 },
                 {
                     id: 3,
                     name: 'second-level-1',
                     relations: {
-                        parent: 1
-                    }
+                        parent: 0
+                    },
+                    group: 1
                 },
                 {
                     id: 4,
                     name: 'first-level-3',
                     relations: {
-                        parent: 1
-                    }
+                        parent: 0
+                    },
+                    group: 1
                 },
                 {
                     id: 5,
                     name: 'first-level-3',
                     relations: {
-                        parent: 2
-                    }
+                        parent: 0
+                    },
+                    group: 1
                 },
                 {
                     id: 6,
                     name: 'first-level-3',
                     relations: {
-                        parent: 1
-                    }
+                        parent: 2
+                    },
+                    group: 1
+                },
+                {
+                    id: 7,
+                    name: 'first-level-3',
+                    relations: {
+                        parent: 2
+                    },
+                    group: 2
+                },
+                {
+                    id: 8,
+                    name: 'first-level-3',
+                    relations: {
+                        parent: 2
+                    },
+                    group: 2
+                },
+                {
+                    id: 9,
+                    name: 'first-level-3',
+                    relations: {
+                        parent: 2
+                    },
+                    group: 2
+                },
+                {
+                    id: 10,
+                    name: 'first-level-3',
+                    relations: {
+                        parent: 6
+                    },
+                    group: 2
+                },
+                {
+                    id: 11,
+                    name: 'first-level-3',
+                    relations: {
+                        parent: 9
+                    },
+                    group: 2
                 }
-            ]
+            ];
 
 
             var testTree = new ics.Tree(test);
@@ -69,6 +117,6 @@
     </script>
 </head>
 <body>
-    <div id="picture" style="width: 500px; height: 400px;"></div>
+    <div id="picture" style="width: 1000px; height: 600px;"></div>
 </body>
 </html>
