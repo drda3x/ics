@@ -31,11 +31,12 @@
             }
 	    });
 
-	    for(var elem in this.content) {
+	    for(var index in this.content) {
 	    	/**
 			 * 1. Узнать слой на который надо вставить элемент
 			 * 2. Вставить элемент на позицию
 	    	 */
+	    	 var elem = this.content[index]
 	    	 var layer = this.getLayer(elem);
 	    	 layer.push(elem);
 	    }
@@ -75,21 +76,34 @@
      */
     Tree.prototype.getLayer = function(element) {
 
-        if(element.parents == null) {
-            return this.structure[0];
+        if(element.relations == null) {
+        	var layer = this.structure[0];
+        	if(layer) {
+        		return layer;      	
+        	} else {
+        		layer = [];
+        		this.structure.push(layer);
+        		return layer;
+        	}
+            
         }
 
         var thisLayer = false;
 
-    	for(var layer in this.structure) {
-            for (var _element in layer) {
-                if (_element.id = element.parent) {
+    	for(var layers in this.structure) {
+    		var layer = this.structure[layers];
+
+    		if (thisLayer) {
+                return layer;
+            }
+
+            for (var _elements in layer) {
+            	var _element = layer[_elements];
+                if (_element.id == element.relations.parent) {
                     thisLayer = true;
                 }
             }
-            if (thisLayer) {
-                return layer;
-            }
+            
         }
 
         if (thisLayer) {
@@ -97,8 +111,7 @@
             this.structure.push(layer);
             return layer;
         }
-        return null;
-
+        return undefined;
     }
 
     function TreeElement(id, name, parents, neighbors) {
